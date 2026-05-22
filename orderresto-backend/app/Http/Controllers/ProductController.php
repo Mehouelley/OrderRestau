@@ -8,6 +8,19 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+// Helper function to convert relative image paths to absolute URLs
+if (! function_exists('getImageUrl')) {
+    function getImageUrl(?string $imagePath): ?string {
+        if (!$imagePath) {
+            return null;
+        }
+        if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
+            return $imagePath;
+        }
+        return route('media.show', $imagePath);
+    }
+}
+
 class ProductController extends Controller
 {
     public function listByRestaurant(string $slug): JsonResponse
@@ -22,7 +35,7 @@ class ProductController extends Controller
                 'description' => $p->description,
                 'price' => (float) $p->price,
                 'prep_time_minutes' => $p->prep_time_minutes,
-                'image_url' => $p->image_url,
+                'image_url' => getImageUrl($p->image_url),
                 'available' => $p->available,
             ];
         });
@@ -42,7 +55,7 @@ class ProductController extends Controller
                 'description' => $p->description,
                 'price' => (float) $p->price,
                 'prep_time_minutes' => $p->prep_time_minutes,
-                'image_url' => $p->image_url,
+                'image_url' => getImageUrl($p->image_url),
                 'available' => $p->available,
             ];
         });
@@ -92,7 +105,7 @@ class ProductController extends Controller
             'description' => $product->description,
             'price' => (float) $product->price,
             'prep_time_minutes' => $product->prep_time_minutes,
-            'image_url' => $product->image_url,
+            'image_url' => getImageUrl($product->image_url),
             'available' => $product->available,
         ], 201);
     }
@@ -135,7 +148,7 @@ class ProductController extends Controller
             'description' => $product->description,
             'price' => (float) $product->price,
             'prep_time_minutes' => $product->prep_time_minutes,
-            'image_url' => $product->image_url,
+            'image_url' => getImageUrl($product->image_url),
             'available' => $product->available,
         ]);
     }
