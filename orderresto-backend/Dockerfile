@@ -27,7 +27,10 @@ RUN mkdir -p bootstrap/cache \
 RUN composer install --no-dev --optimize-autoloader
 
 RUN php artisan key:generate --force || true
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 10000
 
-CMD php artisan serve --host 0.0.0.0 --port ${PORT:-10000}
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+CMD sh -c "php artisan serve --host 0.0.0.0 --port ${PORT:-10000}"
