@@ -18,6 +18,12 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
+# Ensure required writable directories exist before running Composer (artisan package:discover requires them)
+RUN mkdir -p bootstrap/cache \
+    storage/framework/{sessions,views,cache} \
+    storage/app && \
+    chmod -R 0777 bootstrap/cache storage || true
+
 RUN composer install --no-dev --optimize-autoloader
 
 RUN php artisan key:generate --force || true
