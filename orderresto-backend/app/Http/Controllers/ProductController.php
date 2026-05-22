@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\CloudinaryService;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +27,8 @@ if (! function_exists('getImageUrl')) {
 
 class ProductController extends Controller
 {
+    public function __construct(private readonly CloudinaryService $cloudinary) {}
+
     public function listByRestaurant(string $slug): JsonResponse
     {
         $products = Product::whereHas('restaurant', function ($q) use ($slug) {
@@ -89,7 +93,14 @@ class ProductController extends Controller
         // Handle image upload
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $validated['image_url'] = $file->store('products', 'public');
+
+            $uploaded = $this->cloudinary->uploadImage($file, 'orderrestau/products');
+
+            if ($uploaded) {
+                $validated['image_url'] = $uploaded['url'];
+            } else {
+                $validated['image_url'] = $file->store('products', 'public');
+            }
         }
 
         unset($validated['image']);
@@ -135,8 +146,17 @@ class ProductController extends Controller
             $file = $request->file('image');
             if ($product->image_url && ! preg_match('/^https?:\/\//i', $product->image_url)) {
                 Storage::disk('public')->delete($product->image_url);
+            } elseif ($this->cloudinary->isCloudinaryUrl($product->image_url)) {
+                $this->cloudinary->destroyByUrl($product->image_url);
             }
-            $validated['image_url'] = $file->store('products', 'public');
+
+            $uploaded = $this->cloudinary->uploadImage($file, 'orderrestau/products');
+
+            if ($uploaded) {
+                $validated['image_url'] = $uploaded['url'];
+            } else {
+                $validated['image_url'] = $file->store('products', 'public');
+            }
         }
 
         unset($validated['image']);

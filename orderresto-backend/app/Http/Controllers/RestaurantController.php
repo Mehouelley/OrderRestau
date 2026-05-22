@@ -3,12 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Restaurant;
+use App\Services\CloudinaryService;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class RestaurantController extends Controller
 {
+    public function __construct(private readonly CloudinaryService $cloudinary) {}
+
     private function resolveImageUrl(?string $value): ?string
     {
         if (! $value) {
@@ -120,9 +124,17 @@ class RestaurantController extends Controller
 
             if ($restaurant->image_url && ! preg_match('/^https?:\/\//i', $restaurant->image_url)) {
                 Storage::disk('public')->delete($restaurant->image_url);
+            } elseif ($this->cloudinary->isCloudinaryUrl($restaurant->image_url)) {
+                $this->cloudinary->destroyByUrl($restaurant->image_url);
             }
 
-            $validated['image_url'] = $file->store('restaurants/logos', 'public');
+            $uploaded = $this->cloudinary->uploadImage($file, 'orderrestau/restaurants/logos');
+
+            if ($uploaded) {
+                $validated['image_url'] = $uploaded['url'];
+            } else {
+                $validated['image_url'] = $file->store('restaurants/logos', 'public');
+            }
         }
 
         unset($validated['logo']);
