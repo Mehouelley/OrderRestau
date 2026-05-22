@@ -21,6 +21,15 @@ if [ -n "$VIEW_COMPILED_PATH" ]; then
   chmod -R 0777 "$VIEW_COMPILED_PATH" || true
 fi
 
+# AUTO-CONFIGURE APP_URL and FRONTEND_URL for production
+if [ -z "$APP_URL" ]; then
+  export APP_URL="https://orderresto-backend.onrender.com"
+fi
+
+if [ -z "$FRONTEND_URL" ]; then
+  export FRONTEND_URL="https://order-restau.vercel.app"
+fi
+
 # If DB is configured, ensure sessions table migration exists and run migrations
 if [ -n "$DB_CONNECTION" ] && [ "$DB_CONNECTION" != "sqlite" ]; then
   # create sessions table migration if not present
