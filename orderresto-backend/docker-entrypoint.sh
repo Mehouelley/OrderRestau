@@ -21,5 +21,16 @@ if [ -n "$VIEW_COMPILED_PATH" ]; then
   chmod -R 0777 "$VIEW_COMPILED_PATH" || true
 fi
 
+# If DB is configured, ensure sessions table migration exists and run migrations
+if [ -n "$DB_CONNECTION" ] && [ "$DB_CONNECTION" != "sqlite" ]; then
+  # create sessions table migration if not present
+  if ! ls database/migrations/*_create_sessions_table.php > /dev/null 2>&1; then
+    php artisan session:table || true
+  fi
+
+  # run migrations (may fail if DB not reachable yet)
+  php artisan migrate --force || true
+fi
+
 # Execute the command
 exec "$@"
