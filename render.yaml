@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: orderresto-backend
+    env: php
+    rootDir: orderresto-backend
+    buildCommand: composer install --no-dev --optimize-autoloader
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false

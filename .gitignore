@@ -3,7 +3,6 @@ node_modules/
 dist/
 dist-ssr/
 *.local
-package-lock.json
 
 # Frontend - Logs
 logs
@@ -16,7 +15,6 @@ lerna-debug.log*
 
 # Backend - Laravel dependencies & cache
 orderresto-backend/vendor/
-orderresto-backend/composer.lock
 orderresto-backend/storage/app/*
 orderresto-backend/storage/framework/cache/*
 orderresto-backend/storage/framework/sessions/*
