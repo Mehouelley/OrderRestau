@@ -17,7 +17,9 @@ if (! function_exists('getImageUrl')) {
         if (filter_var($imagePath, FILTER_VALIDATE_URL)) {
             return $imagePath;
         }
-        return route('media.show', $imagePath);
+        $url = route('media.show', $imagePath);
+        // Ensure HTTPS in production
+        return str_replace('http://', 'https://', $url);
     }
 }
 
