@@ -1,6 +1,8 @@
 import { Plus, Clock } from 'lucide-react';
 import { resolveMediaUrl } from '../services/api';
 
+const FALLBACK_PRODUCT_IMAGE = 'https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=600';
+
 interface Product {
   id: string;
   name: string;
@@ -28,6 +30,9 @@ export default function CardProduit({ product, onAdd }: CardProduitProps) {
           src={resolveMediaUrl(product.image_url)}
           alt={product.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          onError={(e) => {
+            e.currentTarget.src = FALLBACK_PRODUCT_IMAGE;
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-white/90 text-xs">
