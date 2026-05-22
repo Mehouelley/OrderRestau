@@ -1,4 +1,19 @@
-const API_BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
+const normalizeApiBase = (rawValue?: string) => {
+  const value = (rawValue || '/api').replace(/\/$/, '');
+
+  if (value === '/api') {
+    return value;
+  }
+
+  // If a full backend URL is provided without /api, append it automatically.
+  if (/^https?:\/\//i.test(value) && !/\/api$/i.test(value)) {
+    return `${value}/api`;
+  }
+
+  return value;
+};
+
+const API_BASE = normalizeApiBase(import.meta.env.VITE_API_URL);
 
 type CachedResponse<T> = {
   timestamp: number;
