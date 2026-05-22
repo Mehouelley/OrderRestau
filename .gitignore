@@ -1,0 +1,62 @@
+# Frontend - Node dependencies & build
+node_modules/
+dist/
+dist-ssr/
+*.local
+package-lock.json
+
+# Frontend - Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Backend - Laravel dependencies & cache
+orderresto-backend/vendor/
+orderresto-backend/composer.lock
+orderresto-backend/storage/app/*
+orderresto-backend/storage/framework/cache/*
+orderresto-backend/storage/framework/sessions/*
+orderresto-backend/storage/framework/views/*
+orderresto-backend/storage/logs/*
+orderresto-backend/bootstrap/cache/*
+orderresto-backend/public/storage
+orderresto-backend/.phpunit.result.cache
+
+# Database
+orderresto-backend/database.sqlite
+orderresto-backend/database.sqlite-journal
+
+# Environment files
+.env
+.env.local
+.env.*.local
+orderresto-backend/.env
+orderresto-backend/.env.local
+orderresto-backend/.env.*.local
+
+# IDE & Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.coverage
