@@ -16,6 +16,11 @@ class CorsMiddleware
         // Vérifier si l'origine est autorisée
         $isOriginAllowed = $origin && in_array($origin, $allowedOrigins);
 
+        // Forcer l'API à répondre en JSON pour éviter que Laravel redirige sur erreurs de validation
+        if ($request->is('api/*')) {
+            $request->headers->set('Accept', 'application/json');
+        }
+
         // Traiter les requêtes preflight (OPTIONS)
         if ($request->isMethod('OPTIONS')) {
             $response = response('', 200);
@@ -31,7 +36,7 @@ class CorsMiddleware
 
         // Traiter les requêtes normales
         $response = $next($request);
-        
+
         if ($isOriginAllowed) {
             $response->header('Access-Control-Allow-Origin', $origin)
                 ->header('Access-Control-Allow-Credentials', 'true')
