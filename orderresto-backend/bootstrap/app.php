@@ -17,9 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/*',
         ]);
 
-        $middleware->api(append: [
-            \App\Http\Middleware\MethodSpoofing::class,
+        $middleware->api(prepend: [
             \App\Http\Middleware\CorsMiddleware::class,
+        ], append: [
+            \App\Http\Middleware\MethodSpoofing::class,
         ]);
 
         $middleware->alias([
