@@ -18,12 +18,7 @@ class CorsMiddleware
 
         // Forcer l'API à répondre en JSON pour éviter que Laravel redirige sur erreurs de validation
         // MAIS: exclure les GET et les routes de redirection (callbacks)
-        $isModifyingRequest = $request->isMethod(['POST', 'PUT', 'PATCH', 'DELETE']);
-        $isNotCallback = !$request->is('api/payments/*/callback') && !$request->is('api/kitchen/access');
-        
-        if ($request->is('api/*') && $isModifyingRequest && $isNotCallback) {
-            $request->headers->set('Accept', 'application/json');
-        }
+        $isModifyingRequest = in_array($request->getMethod(), ['POST', 'PUT', 'PATCH', 'DELETE']);
 
         // Traiter les requêtes preflight (OPTIONS)
         if ($request->isMethod('OPTIONS')) {
