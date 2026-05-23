@@ -261,7 +261,7 @@ class FedapayController extends Controller
             'currency' => [
                 'iso' => 'XOF',
             ],
-            'callback_url' => $appUrl . '/api/payments/fedapay/callback',
+            'callback_url' => rtrim($appUrl, '/') . '/api/payments/fedapay/callback',
             'custom_metadata' => [
                 'order_id' => $order->id,
             ],
