@@ -17,7 +17,11 @@ class CorsMiddleware
         $isOriginAllowed = $origin && in_array($origin, $allowedOrigins);
 
         // Forcer l'API à répondre en JSON pour éviter que Laravel redirige sur erreurs de validation
-        if ($request->is('api/*')) {
+        // MAIS: exclure les GET et les routes de redirection (callbacks)
+        $isModifyingRequest = $request->isMethod(['POST', 'PUT', 'PATCH', 'DELETE']);
+        $isNotCallback = !$request->is('api/payments/*/callback') && !$request->is('api/kitchen/access');
+        
+        if ($request->is('api/*') && $isModifyingRequest && $isNotCallback) {
             $request->headers->set('Accept', 'application/json');
         }
 
