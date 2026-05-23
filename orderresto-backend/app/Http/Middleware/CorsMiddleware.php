@@ -16,9 +16,11 @@ class CorsMiddleware
         // Vérifier si l'origine est autorisée
         $isOriginAllowed = $origin && in_array($origin, $allowedOrigins);
 
-        // Forcer l'API à répondre en JSON pour éviter que Laravel redirige sur erreurs de validation
-        // MAIS: exclure les GET et les routes de redirection (callbacks)
-        $isModifyingRequest = in_array($request->getMethod(), ['POST', 'PUT', 'PATCH', 'DELETE']);
+        // Forcer l'API à répondre en JSON pour les POST/PUT/PATCH/DELETE
+        // pour éviter que Laravel redirige sur erreurs de validation
+        if ($request->is('api/*') && in_array($request->getMethod(), ['POST', 'PUT', 'PATCH', 'DELETE'])) {
+            $request->headers->set('Accept', 'application/json');
+        }
 
         // Traiter les requêtes preflight (OPTIONS)
         if ($request->isMethod('OPTIONS')) {
