@@ -20,6 +20,22 @@ export default function Paiement() {
   const openedInvoiceRef = useRef(false);
   const estimatedPrepMinutes = order?.estimated_prep_minutes ?? 20;
   const promisedReadyAt = order?.promised_ready_at ? new Date(order.promised_ready_at) : null;
+  const invoiceUrlFromQuery = new URLSearchParams(location.search).get('invoice_url');
+
+  const getInvoiceUrl = (orderId?: string | number | null) => {
+    const rawBase = import.meta.env.VITE_API_URL || '/api';
+    const base = rawBase.replace(/\/$/, '');
+
+    if (base === '/api') {
+      return `/api/orders/${orderId}/invoice`;
+    }
+
+    if (/^https?:\/\//i.test(base) && !/\/api$/i.test(base)) {
+      return `${base}/api/orders/${orderId}/invoice`;
+    }
+
+    return `${base}/orders/${orderId}/invoice`;
+  };
 
   useEffect(() => {
     if (!commandeId) {
@@ -46,14 +62,11 @@ export default function Paiement() {
   useEffect(() => {
     if (!confirmed) return;
 
-    const params = new URLSearchParams(location.search);
-    const invoiceUrl = params.get('invoice_url');
-
-    if (invoiceUrl && !openedInvoiceRef.current) {
+    if (invoiceUrlFromQuery && !openedInvoiceRef.current) {
       openedInvoiceRef.current = true;
-      window.open(invoiceUrl, '_blank', 'noopener,noreferrer');
+      window.open(invoiceUrlFromQuery, '_blank', 'noopener,noreferrer');
     }
-  }, [confirmed, location.search]);
+  }, [confirmed, invoiceUrlFromQuery]);
 
   const handleConfirm = async () => {
     setLoading(true);
@@ -155,7 +168,7 @@ export default function Paiement() {
           </button>
           <div className="mt-4">
             <button
-              onClick={() => window.open(`/api/orders/${order?.id}/invoice`, '_blank', 'noopener,noreferrer')}
+              onClick={() => window.open(invoiceUrlFromQuery || getInvoiceUrl(order?.id), '_blank', 'noopener,noreferrer')}
               className="btn"
             >
               Télécharger la facture
