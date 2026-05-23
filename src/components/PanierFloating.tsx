@@ -46,7 +46,7 @@ export default function PanierFloating() {
         })),
         order_type: orderType,
         special_instructions: specialInstructions,
-        table_id: tableId || null,
+        table_id: isEmporter ? null : (tableId || null),
         total: totalPrice,
         customer_phone: null,
       });

@@ -9,7 +9,6 @@ use App\Models\RestaurantTable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Models\Payment;
 
 class OrderController extends Controller
 {
@@ -17,6 +16,11 @@ class OrderController extends Controller
     {
         if ($request->boolean('__ping')) {
             return response()->json(['ok' => true], 200);
+        }
+
+        // En mode emporter, on ne doit jamais valider / utiliser une table
+        if ($request->input('order_type') === 'emporter') {
+            $request->merge(['table_id' => null]);
         }
 
         $validated = $request->validate([
@@ -32,8 +36,8 @@ class OrderController extends Controller
         ]);
 
         // Verify table belongs to the restaurant if provided
-        if (isset($validated['table_id']) && $validated['table_id']) {
-                $table = RestaurantTable::where('id', $validated['table_id'])
+        if (($validated['order_type'] ?? null) === 'sur_place' && isset($validated['table_id']) && $validated['table_id']) {
+            $table = RestaurantTable::where('id', $validated['table_id'])
                 ->where('restaurant_id', $validated['restaurant_id'])
                 ->firstOrFail();
         }
