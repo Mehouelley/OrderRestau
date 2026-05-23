@@ -72,7 +72,7 @@ export default function Paiement() {
     setLoading(true);
     setPaymentError('');
     try {
-        const res = await api.payments.createCheckout({
+      const res = await api.payments.createCheckout({
         order_id: String(commandeId),
         customer_phone: phone || null,
         customer_name: customerName || null,
@@ -85,9 +85,18 @@ export default function Paiement() {
         return;
       }
 
+      if (res.error) {
+        setPaymentError(
+          typeof res.error === 'string'
+            ? res.error
+            : (res.error as any)?.message || 'Une erreur est survenue côté serveur.'
+        );
+        return;
+      }
+
       setPaymentError('Impossible de lancer le paiement. Veuillez reessayer.');
     } catch (e) {
-      setPaymentError('Erreur lors de la creation du paiement.');
+      setPaymentError(e instanceof Error ? e.message : 'Erreur lors de la creation du paiement.');
     } finally {
       setLoading(false);
     }

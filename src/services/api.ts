@@ -147,6 +147,7 @@ const fetchAPI = async <T = any>(endpoint: string, options: FetchOptions = {}): 
 
       if (!response.ok) {
         let errorMessage = `API Error: ${response.status}`;
+        let errorDetails: unknown = null;
         const contentType = response.headers.get('content-type');
 
         // Si 401, le token est invalide/expiré
@@ -158,6 +159,17 @@ const fetchAPI = async <T = any>(endpoint: string, options: FetchOptions = {}): 
           if (contentType?.includes('application/json')) {
             const error = await response.json();
             errorMessage = error.message || error.error || errorMessage;
+            errorDetails = error.errors || error.details || null;
+
+            if (errorDetails && typeof errorDetails === 'object') {
+              const firstFieldErrors = Object.values(errorDetails as Record<string, unknown>)[0];
+              if (Array.isArray(firstFieldErrors) && firstFieldErrors.length > 0) {
+                const firstMessage = firstFieldErrors[0];
+                if (typeof firstMessage === 'string' && firstMessage.trim()) {
+                  errorMessage = firstMessage;
+                }
+              }
+            }
           } else {
             const text = await response.text();
             console.error('Server returned non-JSON response:', text.substring(0, 200));
@@ -172,6 +184,7 @@ const fetchAPI = async <T = any>(endpoint: string, options: FetchOptions = {}): 
           error: {
             status: response.status,
             message: errorMessage,
+            details: errorDetails,
           },
         };
       }
