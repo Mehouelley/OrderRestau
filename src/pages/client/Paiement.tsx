@@ -17,7 +17,6 @@ export default function Paiement() {
   const [loading, setLoading] = useState(true);
   const [paymentError, setPaymentError] = useState('');
   const [order, setOrder] = useState<any>(null);
-  const openedInvoiceRef = useRef(false);
   const estimatedPrepMinutes = order?.estimated_prep_minutes ?? 20;
   const promisedReadyAt = order?.promised_ready_at ? new Date(order.promised_ready_at) : null;
   const invoiceUrlFromQuery = new URLSearchParams(location.search).get('invoice_url');
@@ -58,15 +57,6 @@ export default function Paiement() {
       setConfirmed(true);
     }
   }, [location.search]);
-
-  useEffect(() => {
-    if (!confirmed) return;
-
-    if (invoiceUrlFromQuery && !openedInvoiceRef.current) {
-      openedInvoiceRef.current = true;
-      window.open(invoiceUrlFromQuery, '_blank', 'noopener,noreferrer');
-    }
-  }, [confirmed, invoiceUrlFromQuery]);
 
   const handleConfirm = async () => {
     setLoading(true);
