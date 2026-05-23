@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle2, Phone, ArrowLeft, CreditCard, Clock, MapPin, ShoppingBag, UtensilsCrossed } from 'lucide-react';
 import { api } from '../../services/api';
@@ -20,17 +20,18 @@ export default function Paiement() {
   const estimatedPrepMinutes = order?.estimated_prep_minutes ?? 20;
   const promisedReadyAt = order?.promised_ready_at ? new Date(order.promised_ready_at) : null;
   const invoiceUrlFromQuery = new URLSearchParams(location.search).get('invoice_url');
+  const defaultBackendApiBase = 'https://orderresto-backend.onrender.com/api';
 
   const getInvoiceUrl = (orderId?: string | number | null) => {
-    const rawBase = import.meta.env.VITE_API_URL || '/api';
+    const rawBase = import.meta.env.VITE_API_URL || defaultBackendApiBase;
     const base = rawBase.replace(/\/$/, '');
-
-    if (base === '/api') {
-      return `/api/orders/${orderId}/invoice`;
-    }
 
     if (/^https?:\/\//i.test(base) && !/\/api$/i.test(base)) {
       return `${base}/api/orders/${orderId}/invoice`;
+    }
+
+    if (base === '/api') {
+      return `https://orderresto-backend.onrender.com/api/orders/${orderId}/invoice`;
     }
 
     return `${base}/orders/${orderId}/invoice`;
