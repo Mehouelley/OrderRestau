@@ -137,26 +137,9 @@ export default function MenuDigital() {
             <p className="text-sm font-semibold text-red-800 mb-1">
               Cette table est deja occupee.
             </p>
-            <p className="text-sm text-red-700 mb-3">
-              Precommandeur: {tableContext?.preordered_by?.name || tableContext?.preordered_by?.phone || 'Non renseigne'}
+            <p className="text-sm text-red-700">
+              Une commande est deja en cours sur cette table. Merci d'attendre qu'elle soit liberee.
             </p>
-            <div className="space-y-2">
-              {(tableContext?.active_orders || []).length === 0 ? (
-                <p className="text-sm text-red-700">Aucune commande active pour le moment.</p>
-              ) : (
-                tableContext.active_orders.map((order: any) => (
-                  <div key={order.id} className="rounded-xl bg-white border border-red-100 p-3">
-                    <p className="text-sm font-semibold text-gray-900">
-                      Commande #{order.id} - {order.status}
-                    </p>
-                    <p className="text-xs text-gray-500 mb-1">Client: {order.customer_name || order.customer_phone || 'Non renseigne'}</p>
-                    <p className="text-xs text-gray-600">
-                      {(order.items || []).map((item: any) => `${item.quantity}x ${item.product_name}`).join(', ')}
-                    </p>
-                  </div>
-                ))
-              )}
-            </div>
           </div>
         </div>
       )}
