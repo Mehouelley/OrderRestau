@@ -248,6 +248,23 @@ class FedapayController extends Controller
 
         $order = Order::findOrFail($validated['order_id']);
 
+        // If customer details were provided at checkout, persist them on the order
+        $orderUpdate = [];
+        if (isset($validated['customer_phone']) && $validated['customer_phone'] !== null) {
+            $orderUpdate['customer_phone'] = $validated['customer_phone'];
+        }
+        if (isset($validated['customer_name']) && $validated['customer_name'] !== null) {
+            $orderUpdate['customer_name'] = $validated['customer_name'];
+        }
+        if (!empty($orderUpdate)) {
+            try {
+                $order->update($orderUpdate);
+            } catch (\Exception $e) {
+                // Non-fatal: log but continue creating the transaction
+                Log::warning('Failed to update order with customer info', ['order_id' => $order->id, 'error' => $e->getMessage()]);
+            }
+        }
+
         $apiKey = env('FEDAPAY_SECRET');
         $appUrl = env('APP_URL', config('app.url')) ?: 'http://localhost:3000';
 
