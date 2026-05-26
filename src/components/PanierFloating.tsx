@@ -9,6 +9,8 @@ export default function PanierFloating() {
   const [open, setOpen] = useState(false);
   const [ordering, setOrdering] = useState(false);
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
   const navigate = useNavigate();
   const { restaurantSlug, tableId } = useParams();
   const { items, orderType, specialInstructions, removeItem, updateQuantity, setOrderType, setSpecialInstructions, total, totalItems, maxPrepTime, clearCart } = useCartStore();
@@ -36,6 +38,7 @@ export default function PanierFloating() {
 
   const handleOrder = async () => {
     if (items.length === 0 || !restaurantId) return;
+    if (!customerName.trim()) return;
     setOrdering(true);
     try {
       const res = await api.orders.create({
@@ -48,7 +51,8 @@ export default function PanierFloating() {
         special_instructions: specialInstructions,
         table_id: isEmporter ? null : (tableId || null),
         total: totalPrice,
-        customer_phone: null,
+        customer_phone: customerPhone.trim() || null,
+        customer_name: customerName.trim(),
       });
       if (res.data) {
         clearCart();
@@ -214,6 +218,26 @@ export default function PanierFloating() {
             {/* Special instructions */}
             {items.length > 0 && (
               <div className="px-5 py-3 border-t border-gray-50">
+                <div className="mb-3">
+                  <label className="text-xs font-medium text-gray-500 mb-2 block">Votre nom *</label>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Prénom et nom"
+                    className="input-field text-sm"
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="text-xs font-medium text-gray-500 mb-2 block">Téléphone</label>
+                  <input
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    placeholder="Ex: +229 XX XX XX XX"
+                    className="input-field text-sm"
+                  />
+                </div>
                 <div className="flex items-center gap-2 mb-2">
                   <MessageSquare className="w-4 h-4 text-gray-400" />
                   <label className="text-xs font-medium text-gray-500">Instructions speciales</label>
@@ -242,7 +266,7 @@ export default function PanierFloating() {
                 </p>
                 <button
                   onClick={handleOrder}
-                  disabled={ordering || !restaurantId}
+                  disabled={ordering || !restaurantId || !customerName.trim()}
                   className="btn-primary w-full text-center"
                 >
                   {ordering ? (
@@ -252,6 +276,8 @@ export default function PanierFloating() {
                     </span>
                   ) : !restaurantId ? (
                     'Restaurant non charge'
+                  ) : !customerName.trim() ? (
+                    'Veuillez renseigner votre nom'
                   ) : (
                     'Passer la commande'
                   )}
